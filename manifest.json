@@ -1,14 +1,17 @@
 {
-    "manifest_version": 2,
-    "name": "Container Tab Sorter",
-    "version": "0.1",
-    "description": "Automatically sorts tabs based on their container",
-    "permissions": [
-      "tabs",
-      "contextualIdentities"
-    ],
-    "background": {
-      "scripts": ["background.js"],
-      "persistent": false
-    }
+  "manifest_version": 2,
+  "name": "Container Tab Sorter",
+  "version": "0.1",
+  "description": "Automatically sorts tabs based on their container",
+  "permissions": ["tabs", "contextualIdentities"],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
   }
+}
