@@ -26,10 +26,15 @@ Once installed, Container Tab Sorter works automatically in the background. You 
 4. Tabs without container assignments are always moved to the end of the tab bar.
 5. Within each container group and among non-container tabs, the original tab order is maintained.
 
+## How Pinned Tabs Are Handled
+
+Pinned tabs are kept at the beginning of the tab bar and are not moved or sorted by the extension. Only unpinned tabs are sorted based on their container assignments and your sorting preferences.
+
 ## Privacy and Permissions
 This extension requires the following permissions:
 - `tabs`: To access and manipulate tab information and positions.
 - `contextualIdentities`: To interact with container information.
+- `storage`: To save and retrieve user preferences.
 
 Container Tab Sorter does not collect or transmit any user data. It only reads tab and container information locally to perform its sorting function.
 

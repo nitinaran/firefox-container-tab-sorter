@@ -13,6 +13,24 @@ const arrowUp = '<svg class="arrow-icon"><use xlink:href="#arrow-up"/></svg>';
 const arrowDown =
 	'<svg class="arrow-icon"><use xlink:href="#arrow-down"/></svg>';
 
+function escapeHTML(str) {
+	return str.replace(
+		/[&<>"']/g,
+		(m) =>
+			({
+				"&": "&amp;",
+				"<": "&lt;",
+				">": "&gt;",
+				'"': "&quot;",
+				"'": "&#39;",
+			})[m],
+	);
+}
+
+function isValidColorCode(code) {
+	return /^#[0-9a-fA-F]{6}$/.test(code);
+}
+
 async function restoreOptions() {
 	// Load saved options
 	const prefs = await browser.storage.local.get({
@@ -39,20 +57,28 @@ async function restoreOptions() {
 
 	// Build the container list
 	containerList.innerHTML = containers
-		.map(
-			(container, index) => `
-        <li class="bg-gray-200 p-3 rounded-md flex items-center justify-between mb-2" data-id="${container.cookieStoreId}">
-          <div class="flex items-center space-x-2">
-            <span class="w-4 h-4 rounded-full" style="background-color: ${container.colorCode};"></span>
-            <span>${container.name}</span>
-          </div>
-          <div class="space-x-2">
-            <button class="move-up text-gray-600 hover:text-gray-800 ${index === 0 ? "hidden" : ""}">${arrowUp}</button>
-            <button class="move-down text-gray-600 hover:text-gray-800 ${index === containers.length - 1 ? "hidden" : ""}">${arrowDown}</button>
-          </div>
-        </li>
-      `,
-		)
+		.map((container, index) => {
+			const colorCode = isValidColorCode(container.colorCode)
+				? container.colorCode
+				: "#000000";
+
+			return `
+                <li class="bg-gray-200 p-3 rounded-md flex items-center justify-between mb-2" data-id="${container.cookieStoreId}">
+                <div class="flex items-center space-x-2">
+                    <span class="w-4 h-4 rounded-full" style="background-color: ${colorCode};"></span>
+                    <span>${escapeHTML(container.name)}</span>
+                </div>
+                <div class="space-x-2">
+                    <button class="move-up text-gray-600 hover:text-gray-800 ${
+											index === 0 ? "hidden" : ""
+										}">${arrowUp}</button>
+                    <button class="move-down text-gray-600 hover:text-gray-800 ${
+											index === containers.length - 1 ? "hidden" : ""
+										}">${arrowDown}</button>
+                </div>
+                </li>
+            `;
+		})
 		.join("");
 
 	// Set tab sorting options

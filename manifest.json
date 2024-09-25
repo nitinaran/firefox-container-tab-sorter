@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Container Tab Sorter",
-	"version": "0.2",
+	"version": "0.3",
 	"description": "Automatically sorts tabs based on their container",
 	"permissions": ["tabs", "contextualIdentities", "storage"],
 	"content_security_policy": "script-src 'self'; object-src 'self'",
@@ -19,5 +19,5 @@
 		"page": "options.html",
 		"browser_style": true
 	},
-	"web_accessible_resources": ["css/*", "icons/*"]
+	"web_accessible_resources": ["css/tailwind.min.css", "icons/*"]
 }

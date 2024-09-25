@@ -1,22 +1,15 @@
 let sortingTimeout = null;
+let sortPending = false;
 let isSorting = false;
-let sortScheduled = false;
 
 browser.tabs.onCreated.addListener((tab) => {
-	if (
-		!tab.url.startsWith("moz-extension://") &&
-		!tab.url.startsWith("about:")
-	) {
+	if (tab.url && !isFirefoxInternal(tab.url)) {
 		scheduleSorting();
 	}
 });
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-	if (
-		changeInfo.url &&
-		!tab.url.startsWith("moz-extension://") &&
-		!tab.url.startsWith("about:")
-	) {
+	if (changeInfo.url && !isFirefoxInternal(changeInfo.url)) {
 		scheduleSorting();
 	}
 });
@@ -46,19 +39,19 @@ browser.storage.onChanged.addListener((changes, areaName) => {
 });
 
 function scheduleSorting() {
-	if (isSorting || sortScheduled) return; // Prevent scheduling if sorting is already in progress or scheduled
-	sortScheduled = true;
 	if (sortingTimeout) {
 		clearTimeout(sortingTimeout);
 	}
 	sortingTimeout = setTimeout(() => {
-		sortScheduled = false;
 		sortTabs();
 	}, 500);
 }
 
 async function sortTabs() {
-	if (isSorting) return; // Prevent re-entrance
+	if (isSorting) {
+		sortPending = true;
+		return;
+	}
 	isSorting = true;
 	try {
 		const tabs = await browser.tabs.query({ currentWindow: true });
@@ -125,11 +118,11 @@ async function sortTabs() {
 				let bValue = "";
 
 				if (prefs.tabSortCriteria === "title") {
-					aValue = (a.title || "").toLowerCase();
-					bValue = (b.title || "").toLowerCase();
+					aValue = assureString(a.title).toLowerCase();
+					bValue = assureString(b.title).toLowerCase();
 				} else if (prefs.tabSortCriteria === "url") {
-					aValue = (a.url || "").toLowerCase();
-					bValue = (b.url || "").toLowerCase();
+					aValue = assureString(a.url).toLowerCase();
+					bValue = assureString(b.url).toLowerCase();
 				} else if (prefs.tabSortCriteria === "domain") {
 					aValue = getDomain(a.url);
 					bValue = getDomain(b.url);
@@ -144,15 +137,24 @@ async function sortTabs() {
 
 		// Move unpinned tabs to start after pinned tabs
 		const tabIds = sortedTabs.map((tab) => tab.id);
-		await browser.tabs.move(tabIds, { index: pinnedTabs.length });
+		try {
+			await browser.tabs.move(tabIds, { index: pinnedTabs.length });
+		} catch (e) {
+			console.error("Error moving tabs:", e);
+		}
 	} catch (error) {
 		console.error("Error sorting tabs in sortTabs():", error);
 	} finally {
 		isSorting = false;
+		if (sortPending) {
+			sortPending = false;
+			sortTabs();
+		}
 	}
 }
 
 function getDomain(url) {
+	if (!url) return "";
 	try {
 		const urlObject = new URL(url);
 		return urlObject.hostname;
@@ -160,4 +162,15 @@ function getDomain(url) {
 		console.error("Error parsing URL:", e);
 		return url;
 	}
+}
+
+function isFirefoxInternal(url) {
+	return url.startsWith("about:") || url.startsWith("moz-extension://");
+}
+
+function assureString(value) {
+	if (typeof value === "string") {
+		return value;
+	}
+	return "";
 }
