@@ -3,6 +3,7 @@
 		"@biomejs/biome": "1.9.2"
 	},
 	"scripts": {
-		"format": "biome format --write ."
+		"format": "biome format --write .",
+        "package": "zip -r container-tab-sorter.zip background.js css icons LICENSE manifest.json options.html options.js -x \"*/node_modules/*\" \"package*.json\" \"biome.json\" \"README.md\""
 	}
 }
