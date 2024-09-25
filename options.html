@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Container Auto Sort Options</title>
+    <link href="css/tailwind.min.css" rel="stylesheet" />
+    <style>
+        .container-item {
+            transition: transform 300ms ease-in-out;
+        }
+
+        .arrow-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .moving-up {
+            animation: moveUp 0.15s ease-in-out;
+        }
+
+        .moving-down {
+            animation: moveDown 0.15s ease-in-out;
+        }
+
+        @keyframes moveUp {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-100%);
+            }
+        }
+
+        @keyframes moveDown {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(100%);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">
+            Container Auto Sort Options
+        </h1>
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">
+                Container Order
+            </h2>
+            <p class="mb-4 text-gray-600">
+                Use arrows to adjust container sort order:
+            </p>
+            <ul id="containerList" class="space-y-2"></ul>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Tab Sorting</h2>
+            <div class="space-y-4">
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" id="sortTabsInGroup" class="form-checkbox h-5 w-5 text-blue-600" />
+                    <span class="text-gray-700">Sort tabs within each container group</span>
+                </label>
+                <div class="flex flex-col space-y-2">
+                    <span class="text-gray-700">Sort tabs by:</span>
+                    <label class="flex items-center space-x-2">
+                        <input type="radio" name="tabSortCriteria" value="title" id="sortByTitle"
+                            class="form-radio h-4 w-4 text-blue-600" />
+                        <span>Title</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="radio" name="tabSortCriteria" value="url" id="sortByURL"
+                            class="form-radio h-4 w-4 text-blue-600" />
+                        <span>URL</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="radio" name="tabSortCriteria" value="domain" id="sortByDomain"
+                            class="form-radio h-4 w-4 text-blue-600" />
+                        <span>Domain</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="flex space-x-4">
+            <button id="saveButton"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
+                Save Options
+            </button>
+        </div>
+    </div>
+    <script src="options.js"></script>
+
+    <!-- SVG Definitions -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+        <symbol id="arrow-up" viewBox="0 0 24 24">
+            <path d="M12 5l-8 8h6v6h4v-6h6z" />
+        </symbol>
+        <symbol id="arrow-down" viewBox="0 0 24 24">
+            <path d="M12 19l-8-8h6V5h4v6h6z" />
+        </symbol>
+    </svg>
+</body>
+
+</html>
