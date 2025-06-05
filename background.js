@@ -55,6 +55,7 @@ async function sortTabs() {
 	isSorting = true;
 	try {
 		const tabs = await browser.tabs.query({ currentWindow: true });
+		const windowId = tabs[0].windowId;
 
 		// Exclude extension and special tabs
 		const filteredTabs = tabs.filter(
@@ -73,6 +74,7 @@ async function sortTabs() {
 		const prefs = await browser.storage.local.get({
 			containerOrder: [],
 			sortTabsInGroup: false,
+			createTabGroups: true, // Default to true for the new option
 			tabSortCriteria: "domain", // Can be 'title', 'url', or 'domain'
 		});
 
@@ -141,10 +143,45 @@ async function sortTabs() {
 
 			if (tabIds.length > 0) {
 				try {
+					// Move tabs to the correct position
 					await browser.tabs.move(tabIds, { index: currentIndex });
 					currentIndex += tabIds.length;
 				} catch (e) {
 					console.error(`Error moving tabs for container ${cookieStoreId}:`, e);
+				}
+			}
+		}
+		
+		// After sorting, create tab groups for containers if enabled
+		if (prefs.createTabGroups) {
+			for (const cookieStoreId of sortedContainerIds) {
+				// Skip default container
+				if (cookieStoreId === "firefox-default") continue;
+				
+				// Skip if no container info
+				if (!containerMap[cookieStoreId]) continue;
+				
+				const containerTabs = containerGroups[cookieStoreId];
+				const tabIds = containerTabs.map(tab => tab.id);
+				
+				if (tabIds.length > 0) {
+					try {
+						const containerName = containerMap[cookieStoreId].name;
+						
+						// First, create a group with the tabs
+						const groupId = await browser.tabs.group({ tabIds: tabIds });
+						
+						// Then, update the group with the container name
+						if (groupId) {
+							await browser.tabGroups.update(groupId, { 
+								title: containerName,
+								color: mapContainerColorToGroupColor(containerMap[cookieStoreId].color)
+							});
+						}
+					} catch (e) {
+						console.error(`Error processing tab groups for container ${cookieStoreId}:`, e);
+						console.error(e);
+					}
 				}
 			}
 		}
@@ -157,6 +194,25 @@ async function sortTabs() {
 			sortTabs();
 		}
 	}
+}
+
+// Map Firefox container colors to tab group colors
+function mapContainerColorToGroupColor(containerColor) {
+	const colorMap = {
+		"blue": "blue",
+		"turquoise": "cyan",
+		"green": "green",
+		"yellow": "yellow",
+		"orange": "orange",
+		"red": "red",
+		"pink": "pink",
+		"purple": "purple",
+		// Fallbacks for any other colors
+		"toolbar": "grey",
+		"": "grey"
+	};
+	
+	return colorMap[containerColor] || "grey";
 }
 
 function getDomain(url) {
