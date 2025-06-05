@@ -9,6 +9,8 @@ const sortByTitleRadio = document.getElementById("sortByTitle");
 const sortByURLRadio = document.getElementById("sortByURL");
 const sortByDomainRadio = document.getElementById("sortByDomain");
 
+const createTabGroups = document.getElementById("createTabGroups");
+
 const arrowUp = '<svg class="arrow-icon"><use xlink:href="#arrow-up"/></svg>';
 const arrowDown =
 	'<svg class="arrow-icon"><use xlink:href="#arrow-down"/></svg>';
@@ -37,6 +39,7 @@ async function restoreOptions() {
 		containerOrder: [],
 		sortTabsInGroup: false,
 		tabSortCriteria: "domain",
+		createTabGroups: false,
 	});
 
 	// Fetch all containers
@@ -178,6 +181,7 @@ async function saveOptions() {
 		containerOrder: containerOrder,
 		sortTabsInGroup: sortTabsInGroupCheckbox.checked,
 		tabSortCriteria: tabSortCriteria,
+		createTabGroups: createTabGroups.checked,
 	});
 
 	showMessage("Options saved!", "bg-green-500");
